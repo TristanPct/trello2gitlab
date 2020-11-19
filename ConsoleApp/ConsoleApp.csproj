@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Trello2GitLab.ConsoleApp</RootNamespace>
+    <AssemblyName>trello2gitlab</AssemblyName>
+    <Product>trello2gitlab</Product>
+    <Company>https://tristanpct.dev</Company>
+    <Authors>Tristan Picut</Authors>
+    <Copyright>Copyright (c) 2020-present Tristan Picut and other contributors</Copyright>
+    <PackageLicenseFile></PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageId>Trello2GitLab.ConsoleApp</PackageId>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Conversion\Conversion.csproj" />
+  </ItemGroup>
+
+</Project>

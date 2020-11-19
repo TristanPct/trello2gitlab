@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Trello2GitLab.Conversion</RootNamespace>
+    <AssemblyName>trello2gitlab.conversion</AssemblyName>
+    <Authors>Tristan Picut</Authors>
+    <Company>https://tristanpct.dev</Company>
+    <Product>trello2gitlab</Product>
+    <Copyright>Copyright (c) 2020-present Tristan Picut and other contributors</Copyright>
+    <PackageLicenseFile></PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageId>Trello2GitLab.Conversion</PackageId>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+</Project>
