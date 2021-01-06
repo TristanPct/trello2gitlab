@@ -33,6 +33,7 @@ namespace Trello2GitLab.Conversion.Trello
             BaseUrl = $"https://api.trello.com/1/boards/{options.BoardId}";
             Key = options.Key;
             Token = options.Token;
+            Include = options.Include;
             client = new HttpClient();
         }
 
@@ -41,6 +42,8 @@ namespace Trello2GitLab.Conversion.Trello
         public string Key { get; }
 
         public string Token { get; }
+
+        public string Include { get; }
 
         public void Dispose()
         {
@@ -98,7 +101,7 @@ namespace Trello2GitLab.Conversion.Trello
         /// <exception cref="HttpRequestException"></exception>
         protected async Task<Board> GetBasicBoardData()
         {
-            return await Request<Board>($"{Url()}&fields=none&cards=all&checklists=all");
+            return await Request<Board>($"{Url()}&fields=none&cards={Include}&checklists=all");
         }
 
         /// <summary>
