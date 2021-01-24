@@ -86,6 +86,9 @@ namespace Trello2GitLab.Conversion
             if (string.IsNullOrEmpty(options.Trello.BoardId))
                 throw new ArgumentNullException(nameof(ConverterOptions.Trello.BoardId), "Missing Trello board ID.");
 
+            if (!new string[] { "all", "open", "visible", "closed" }.Contains(options.Trello.Include))
+                throw new ArgumentException("Valid values are: 'all', 'open', 'visible' or 'closed'", nameof(ConverterOptions.Trello.Include));
+
             if (string.IsNullOrEmpty(options.GitLab.Token))
                 throw new ArgumentNullException(nameof(ConverterOptions.GitLab.Token), "Missing GitLab token.");
 
@@ -192,12 +195,16 @@ namespace Trello2GitLab.Conversion
         {
             var errors = new List<string>();
 
+            // Finds basic infos.
+
             var createAction = FindCreateCardAction(card);
             var createdBy = FindAssociatedUserId(createAction?.IdMemberCreator);
 
             var assignees = card.IdMembers?.Select(m => FindAssociatedUserId(m)).Where(u => u != null).Cast<int>();
 
             var labels = GetCardAssociatedLabels(card);
+
+            // Creates GitLab issue.
 
             Issue issue = null;
 
@@ -222,6 +229,8 @@ namespace Trello2GitLab.Conversion
                 return errors;
             }
 
+            // Create GitLab issue's comments.
+
             foreach (var commentAction in FindCommentActions(card))
             {
                 try
@@ -242,10 +251,27 @@ namespace Trello2GitLab.Conversion
                 }
             }
 
+            // Closes issue if the card or the list is closed.
+
+            Trello.Action closeAction = null;
+
             if (card.Closed)
             {
-                var closeAction = FindCloseCardAction(card);
+                closeAction = FindCloseCardAction(card);
+            }
+            else
+            {
+                var list = trelloBoard.Lists.FirstOrDefault(l => l.Id == card.IdList);
 
+                if (list?.Closed == true)
+                {
+                    list.CloseAction ??= FindCloseListAction(list);
+                    closeAction = list.CloseAction;
+                }
+            }
+
+            if (closeAction != null)
+            {
                 try
                 {
                     await gitlab.EditIssue(
@@ -362,6 +388,19 @@ namespace Trello2GitLab.Conversion
             return trelloBoard.Actions.LastOrDefault(a =>
                 a.Type == "updateCard"
                 && a.Data.Card.Id == card.Id
+                && a.Data.Old.TryGetValue("closed", out object closed)
+                && !(bool)closed
+            );
+        }
+
+        /// <summary>
+        /// Finds the close action of a given Trello list.
+        /// </summary>
+        protected Trello.Action FindCloseListAction(List list)
+        {
+            return trelloBoard.Actions.LastOrDefault(a =>
+                a.Type == "updateList"
+                && a.Data.List.Id == list.Id
                 && a.Data.Old.TryGetValue("closed", out object closed)
                 && !(bool)closed
             );

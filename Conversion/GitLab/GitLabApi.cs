@@ -58,7 +58,20 @@ namespace Trello2GitLab.Conversion.GitLab
         /// </summary>
         public async Task<IReadOnlyList<User>> GetAllUsers()
         {
-            return await Request<IReadOnlyList<User>>(HttpMethod.Get, "/users", projectBasedUrl: false);
+            const int limit = 100;
+            int page = 1;
+            var users = new List<User>();
+
+            IReadOnlyList<User> apiResponseUsers;
+            do
+            {
+                apiResponseUsers = await Request<IReadOnlyList<User>>(HttpMethod.Get, $"/users?per_page={limit}&page={page}", projectBasedUrl: false);
+
+                users.AddRange(apiResponseUsers);
+                page++;
+            } while (apiResponseUsers.Count == limit);
+
+            return users;
         }
 
         /// <summary>
