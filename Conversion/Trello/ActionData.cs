@@ -9,5 +9,7 @@ namespace Trello2GitLab.Conversion.Trello
         public IReadOnlyDictionary<string, object> Old { get; set; }
 
         public Card Card { get; set; }
+
+        public List List { get; set; }
     }
 }
