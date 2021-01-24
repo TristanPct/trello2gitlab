@@ -11,5 +11,7 @@ namespace Trello2GitLab.Conversion.Trello
         public IReadOnlyList<Action> Actions { get; set; }
 
         public IReadOnlyList<Checklist> Checklists { get; set; }
+
+        public IReadOnlyList<List> Lists { get; set; }
     }
 }

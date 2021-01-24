@@ -95,7 +95,7 @@ namespace Trello2GitLab.Conversion.Trello
         /// <exception cref="HttpRequestException"></exception>
         protected async Task<Board> GetBasicBoardData()
         {
-            return await Request<Board>("", $"fields=none&cards={Include}&checklists=all");
+            return await Request<Board>("", $"fields=none&cards={Include}&checklists=all&lists=all");
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Trello2GitLab.Conversion.Trello
             IReadOnlyList<Action> apiResponseActions;
             do
             {
-                apiResponseActions = await Request<IReadOnlyList<Action>>("/actions", $"limit={limit}&filter=createCard,updateCard,commentCard&before={actions.LastOrDefault()?.Id}");
+                apiResponseActions = await Request<IReadOnlyList<Action>>("/actions", $"limit={limit}&filter=createCard,updateCard,commentCard,updateList&before={actions.LastOrDefault()?.Id}");
 
                 actions.AddRange(apiResponseActions);
             } while (apiResponseActions.Count == limit);
