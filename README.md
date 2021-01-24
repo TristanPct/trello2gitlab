@@ -14,7 +14,7 @@ Conversion rules:
 - Labels are kept (matching is done using options file)
 - Assignee are kept (user matching is done using options file)
 - Checklists are converted to Markdown and appended to the description
-- Archived cards are converted to closed issues (unless the `trello.ignoreArchived` option is `true`)
+- Archived cards are converted to closed issues (configurable with the `trello.include` option)
 
 Using the options file you can convert Trello labels or lists to GitLab labels or milestones.
 
