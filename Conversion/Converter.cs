@@ -86,6 +86,9 @@ namespace Trello2GitLab.Conversion
             if (string.IsNullOrEmpty(options.Trello.BoardId))
                 throw new ArgumentNullException(nameof(ConverterOptions.Trello.BoardId), "Missing Trello board ID.");
 
+            if (!new string[] { "all", "open", "visible", "closed" }.Contains(options.Trello.Include))
+                throw new ArgumentException("Valid values are: 'all', 'open', 'visible' or 'closed'", nameof(ConverterOptions.Trello.Include));
+
             if (string.IsNullOrEmpty(options.GitLab.Token))
                 throw new ArgumentNullException(nameof(ConverterOptions.GitLab.Token), "Missing GitLab token.");
 

@@ -58,7 +58,8 @@ Options file format:
       ""trello"": {
           ""key"": <Trello API key (string)>,
           ""token"": <Trello API token (string)>,
-          ""boardId"": <Trello board ID (string)>
+          ""boardId"": <Trello board ID (string)>,
+          ""include"": <Specifies which cards to include (""all""|""open""|""visible""|""closed"") [default: ""all""]>
       },
       ""gitlab"": {
           ""url"": <GitLab server base URL (string) [default: ""https://gitlab.com""]>,

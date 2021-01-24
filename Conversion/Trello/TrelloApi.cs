@@ -33,6 +33,7 @@ namespace Trello2GitLab.Conversion.Trello
             BaseUrl = $"https://api.trello.com/1/boards/{options.BoardId}";
             Key = options.Key;
             Token = options.Token;
+            Include = options.Include;
             client = new HttpClient();
         }
 
@@ -41,6 +42,8 @@ namespace Trello2GitLab.Conversion.Trello
         public string Key { get; }
 
         public string Token { get; }
+
+        public string Include { get; }
 
         public void Dispose()
         {
@@ -62,23 +65,17 @@ namespace Trello2GitLab.Conversion.Trello
         }
 
         /// <summary>
-        /// Builds a Trello Api URL.
-        /// </summary>
-        /// <param name="endpoint">Target endpoint (starting with `/`).</param>
-        protected string Url(string endpoint = null)
-        {
-            return $"{BaseUrl}{endpoint}?key={Key}&token={Token}";
-        }
-
-        /// <summary>
         /// Makes an asynchronous request to Trello API.
         /// </summary>
         /// <typeparam name="T">Fetched data type.</typeparam>
-        /// <param name="url">Target URL.</param>
+        /// <param name="endpoint">Target endpoint (starting with `/`).</param>
+        /// <param name="parameters">Query parameters.</param>
         /// <exception cref="ApiException"></exception>
         /// <exception cref="HttpRequestException"></exception>
-        protected async Task<T> Request<T>(string url)
+        protected async Task<T> Request<T>(string endpoint, string parameters)
         {
+            var url = $"{BaseUrl}{endpoint}?key={Key}&token={Token}&{parameters}";
+
             using (var response = await client.GetAsync(url))
             using (var content = response.Content)
             {
@@ -98,7 +95,7 @@ namespace Trello2GitLab.Conversion.Trello
         /// <exception cref="HttpRequestException"></exception>
         protected async Task<Board> GetBasicBoardData()
         {
-            return await Request<Board>($"{Url()}&fields=none&cards=all&checklists=all");
+            return await Request<Board>("", $"fields=none&cards={Include}&checklists=all");
         }
 
         /// <summary>
@@ -115,7 +112,7 @@ namespace Trello2GitLab.Conversion.Trello
             IReadOnlyList<Action> apiResponseActions;
             do
             {
-                apiResponseActions = await Request<IReadOnlyList<Action>>($"{Url("/actions")}&limit={limit}&filter=createCard,updateCard,commentCard&before={actions.LastOrDefault()?.Id}");
+                apiResponseActions = await Request<IReadOnlyList<Action>>("/actions", $"limit={limit}&filter=createCard,updateCard,commentCard&before={actions.LastOrDefault()?.Id}");
 
                 actions.AddRange(apiResponseActions);
             } while (apiResponseActions.Count == limit);

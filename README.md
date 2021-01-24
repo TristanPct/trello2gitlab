@@ -14,6 +14,7 @@ Conversion rules:
 - Labels are kept (matching is done using options file)
 - Assignee are kept (user matching is done using options file)
 - Checklists are converted to Markdown and appended to the description
+- Archived cards are converted to closed issues (unless the `trello.ignoreArchived` option is `true`)
 
 Using the options file you can convert Trello labels or lists to GitLab labels or milestones.
 
@@ -54,8 +55,9 @@ Create a JSON file with all the needed information:
 `trello.key`                     | Trello API Key.
 `trello.token`                   | Trello API Token.
 `trello.boardId`                 | Trello board ID.
+`trello.include`                 | Specifies which cards to include. [default: `"all"`]<br />`"all"`<br />`"open"` Includes cards that are open in lists that have been archived.<br />`"visible"` Only includes cards in lists that are not closed.<br />`"closed"`
 `gitlab`                         | GitLab specific settings.
-`gitlab.url`                     | GitLab server URL [default: "https://gitlab.com"].
+`gitlab.url`                     | GitLab server URL [default: `"https://gitlab.com"`].
 `gitlab.token`                   | GitLab private access token.
 `gitlab.sudo`                    | Tells if the private token has sudo rights.
 `gitlab.projectId`               | GitLab target project ID.
