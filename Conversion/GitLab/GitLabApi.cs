@@ -58,20 +58,7 @@ namespace Trello2GitLab.Conversion.GitLab
         /// </summary>
         public async Task<IReadOnlyList<User>> GetAllUsers()
         {
-            const int limit = 100;
-            int page = 1;
-            var users = new List<User>();
-
-            IReadOnlyList<User> apiResponseUsers;
-            do
-            {
-                apiResponseUsers = await Request<IReadOnlyList<User>>(HttpMethod.Get, $"/users?per_page={limit}&page={page}", projectBasedUrl: false);
-
-                users.AddRange(apiResponseUsers);
-                page++;
-            } while (apiResponseUsers.Count == limit);
-
-            return users;
+            return await RequestPaged<User>(HttpMethod.Get, "/users", projectBasedUrl: false);
         }
 
         /// <summary>
@@ -83,6 +70,13 @@ namespace Trello2GitLab.Conversion.GitLab
             return await Request<User>(HttpMethod.Put, $"/users/{user.Id}", null, user, projectBasedUrl: false);
         }
 
+        /// <summary>
+        /// Gets all project's milestones.
+        /// </summary>
+        public async Task<IReadOnlyList<Milestone>> GetAllMilestones()
+        {
+            return await RequestPaged<Milestone>(HttpMethod.Get, "/milestones", projectBasedUrl: true);
+        }
         /// <summary>
         /// Creates an issue in the target GitLab server.
         /// </summary>
@@ -128,6 +122,37 @@ namespace Trello2GitLab.Conversion.GitLab
         protected string Url(string endpoint, bool projectBasedUrl)
         {
             return (projectBasedUrl ? ProjectUrl : BaseUrl) + endpoint;
+        }
+
+        /// <summary>
+        /// Makes an asynchronous paged request to GitLab API (without body).
+        /// </summary>
+        /// <typeparam name="T">Fetched data type.</typeparam>
+        /// <param name="method">The HTTP method.</param>
+        /// <param name="endpoint">Target endpoint (starting with `/`).</param>
+        /// <param name="userId">User to impersonate (if sudo).</param>
+        /// <param name="content">HTTP request content.</param>
+        /// <param name="projectBasedUrl">Tells if the API URL targets the project.</param>
+        /// <exception cref="ApiException"></exception>
+        /// <exception cref="HttpRequestException"></exception>
+        internal async Task<IReadOnlyList<T>> RequestPaged<T>(HttpMethod method, string endpoint, int? userId = null, HttpContent content = null, bool projectBasedUrl = true)
+        {
+            const int limit = 100;
+            int page = 1;
+            var items = new List<T>();
+
+            char separator = endpoint.Contains('?') ? '&' : '?';
+
+            IReadOnlyList<T> apiResponseItems;
+            do
+            {
+                apiResponseItems = await Request<IReadOnlyList<T>>(method, $"{endpoint}{separator}per_page={limit}&page={page}", userId, content, projectBasedUrl);
+
+                items.AddRange(apiResponseItems);
+                page++;
+            } while (apiResponseItems.Count == limit);
+
+            return items;
         }
 
         /// <summary>

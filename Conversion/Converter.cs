@@ -131,6 +131,60 @@ namespace Trello2GitLab.Conversion
                 progress.Report(new ConversionProgressReport(ConversionStep.AdminPrivilegesGranted));
             }
 
+            // Fetch project milestones and convert iid to global id.
+
+            if (associations.Labels_Milestones.Count != 0 || associations.Lists_Milestones.Count != 0)
+            {
+                progress.Report(new ConversionProgressReport(ConversionStep.FetchMilestones));
+
+                var milestones = await gitlab.GetAllMilestones();
+
+                var totalMilestones = associations.Labels_Milestones.Count + associations.Lists_Milestones.Count;
+                int i = 0;
+
+                var labelsMilestones = new Dictionary<string, int>();
+                foreach (var labelMilestone in associations.Labels_Milestones)
+                {
+                    progress.Report(new ConversionProgressReport(ConversionStep.FetchMilestones, i, totalMilestones));
+
+                    var milestone = milestones.FirstOrDefault(m => m.Iid == labelMilestone.Value);
+
+                    if (milestone != null)
+                    {
+                        labelsMilestones[labelMilestone.Key] = milestone.Id;
+                    }
+                    else
+                    {
+                        progress.Report(new ConversionProgressReport(ConversionStep.FetchMilestones, i, totalMilestones, new string[] { $"Error while fetching milestone: milestone with iid '{labelMilestone.Value}' not found on project" }));
+                    }
+
+                    i++;
+                }
+                associations.Labels_Milestones = labelsMilestones;
+
+                var listsMilestones = new Dictionary<string, int>();
+                foreach (var listMilestone in associations.Lists_Milestones)
+                {
+                    progress.Report(new ConversionProgressReport(ConversionStep.FetchMilestones, i, totalMilestones));
+
+                    var milestone = milestones.FirstOrDefault(m => m.Iid == listMilestone.Value);
+
+                    if (milestone != null)
+                    {
+                        listsMilestones[listMilestone.Key] = milestone.Id;
+                    }
+                    else
+                    {
+                        progress.Report(new ConversionProgressReport(ConversionStep.FetchMilestones, i, totalMilestones, new string[] { $"Error while fetching milestone: milestone with iid '{listMilestone.Value}' not found on project" }));
+                    }
+
+                    i++;
+                }
+                associations.Lists_Milestones = listsMilestones;
+
+                progress.Report(new ConversionProgressReport(ConversionStep.MilestonesFetched));
+            }
+
             // Convert all cards.
 
             for (int i = 0; i < totalCards; i++)

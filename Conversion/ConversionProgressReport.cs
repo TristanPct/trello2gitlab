@@ -12,6 +12,9 @@ namespace Trello2GitLab.Conversion
         GrantAdminPrivileges,
         AdminPrivilegesGranted,
 
+        FetchMilestones,
+        MilestonesFetched,
+
         ConvertingCards,
         CardsConverted,
 
