@@ -1,3 +1,7 @@
+## v0.2.1 *(2021-05-23)*
+
+- Fix issues milestone association (#8)
+
 ## v0.2.0 *(2021-01-24)*
 
 - Add an option not to transfer archived cards (#2)

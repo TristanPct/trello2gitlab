@@ -34,6 +34,18 @@ namespace Trello2GitLab.ConsoleApp
                     PrintSuccess("\nAdmin privileges granted.\n");
                     return;
 
+                case ConversionStep.FetchMilestones when value.TotalElements == null:
+                    Print("Fetching project milestones...\n");
+                    return;
+
+                case ConversionStep.FetchMilestones when value.TotalElements != null && value.Errors == null:
+                    Print($"Fetching milestone ({value.CurrentIndex + 1} of {value.TotalElements})\r");
+                    return;
+
+                case ConversionStep.MilestonesFetched:
+                    PrintSuccess("\nProject milestones fetched.\n");
+                    return;
+
                 case ConversionStep.ConvertingCards when value.TotalElements == null:
                     Print("Starting cards conversion...\n");
                     return;
